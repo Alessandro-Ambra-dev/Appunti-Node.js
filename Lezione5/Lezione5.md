@@ -69,3 +69,58 @@ Nel .then inseriamo le due funzioni che andranno a gestire i parametri di dati e
 -La catch rimane una sola perché avviene ogni volta che occorre un errore, interrompendo perciò il flusso delle promises;
 
 -TIP => Utilizzare le arrow function per rendere il codice più snello e leggibile
+
+## ASYNC & AWAIT
+
+- Esse sono due parole chiave che ci aiutano a lavorare con l'asyncronous code delle Promises;
+
+-Nell'esempio possiamo vedere che dopo aver importato il modulo fs/promises da node, utilizziamo una funzione con la parola chiave async all'inizio, ciò farà capire a JS che la funzione è asincrona => le variabili e il codice all'interno dell'async function devono necessariamente avere la parola await,farà in modo che JS aspetti la computazione del codice per poi renderlo usufruibile, come succede con le promises;
+
+-Per fare in modo di gestire anche gli errori dobbiamo usare il metodo try & catch => Nel try inseriamo il codice onFulfilled della promise, nel catch invece l' onReject e mettiamo a schermo degli errori;
+
+-Anche con questi costrutti possiaamo inserire più computazioni nello stesso try block, e il codice si interromperà ogni volta che c'è un errore,attivando il catch block;
+
+-Queste due parole chiave servono per rendere più leggibile il codice asincrono e farlo sembrare sincrono;
+
+-Ovviamente con il codice asincrono si può utilizzare una feature che permette di leggere tutte le promises assieme e solo DOPO runnarle, facendo attenzione agli eventuali errori (gestiti dal catch);
+
+-Questa feature è Promise.all che come suggerisce il nome va ad analizzare tutte le promise assieme e le compila in un unico flow;
+
+-Await non richede la callback poiché la parola chiave implicitamente richiede una callback;
+
+-Come usare la await al di fuori di una funzione asincrona in Node.js, questo è possibile poiché stiamo usando un ECMAScript module, che quindi permette all'await di trovarsi anche nel top level del file;
+
+## CALLBACKS AS MIDDLEWARE
+
+-Middelware è un modello reso famoso in Node.js grazie ad Express framework;
+
+-Vedremo le callbacks come middleware per processare delle pipeline di elaborazione funzionanti;
+
+-Utilizzando il framework express per questo progetto, dovremmo importarlo (e quindi scaricarlo con npm), dopo averlo importato creiamo una const app in cui richiamiamo la funzione express(ovvero possiamo utilizzare i metodi al suo interno);
+
+-Aggiungiamo poi una porta di ascolto finale con il . listen (ricordiamoci di inserire il numero del port come valore);
+
+-Runnando così il server la risposta che otterremo sara : 404 not found, questo perché dobbiamo usare delle Middleware per far funzionare il sever.
+
+-Le middleware sono delle callback function che sono organizzate come delle pipelines;
+
+-Nel caso specifico abbiamo due funzioni middleware una che setta l'intestazione della middleware e una che invece setta i dati della middleware, entrambe le callback functions vengono passate all'interno del metodo app.use;
+
+-Express in questo caso funge da vero e proprio manager per i metodi e le callback che inseriamo al suo interno;
+
+-Le middlevwre di express hanno una signature ed una serie di argomenti ben delineati => request, response, next
+
+-Request => è l'oggetto della richiesta http.
+
+-Response => è l'oggetto della risposta del
+server;
+
+-Next => funzione che serve per collegare tra loro le varie middlewares, dice ad espress che le azioni in questa middleware sono finite e di passare all'azione successiva;
+
+-Possiamo anche fare l'handling degli errori con le middleware, se abbiamo un errore lo passiamo nella funzione next della middleware che si occupa di gestire gli errori, se non c'è ovviamente il flow passa alla prossima middleware;
+
+-Quando creiamo un mesaggio di error dobbiamo anche ricordarci di inserire una middleware che si occupi di gestire quando e come gestire l'errore;
+
+-Questa funzione di handling dell'errore va chiamata dopo tutte le middleware create in modo tale che possa gestire tutto il flow della pipeline.
+
+-La funzione si trigghererà ogni volta che nel server c'è un errore, quindi si attiva la middleware che crea l'errore, la quale chiama la middleware che gestisce l'errore per loggare l'errore in console.
