@@ -1,0 +1,1 @@
+An example of flie read stream, WOW!!

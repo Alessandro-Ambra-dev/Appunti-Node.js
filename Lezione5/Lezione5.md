@@ -124,3 +124,39 @@ server;
 -Questa funzione di handling dell'errore va chiamata dopo tutte le middleware create in modo tale che possa gestire tutto il flow della pipeline.
 
 -La funzione si trigghererà ogni volta che nel server c'è un errore, quindi si attiva la middleware che crea l'errore, la quale chiama la middleware che gestisce l'errore per loggare l'errore in console.
+
+## OTHER ASYNCRONOUS PATTERN
+
+## EVENT DRIVEN PROGRAMMING
+
+-Event driven programming utilizzata in Node.js è una forma del pattern osservatore;
+-Un oggetto notifica una serie di listeners quando il suo stato cambia => Nel caso qui riportato utilizziamo un eventemitter dagli events presenti nel core del modulo di node.js, creiamo una const dove stanziamo un'istanza della classe EventEmitter.
+
+Creiamo poi un oggetto data utilizzando la funzione emit sulla classe emitter; Per gestire questo evento creiamo un listener che ci fa il console.log dell'oggetto data con la funzione on;
+
+-Questi event listeners sono molto comuni in molte APi di node.js ma tendenzialmente servono ad estendere la EventEmitter class.
+
+## FLUSSI NODE.JS
+
+-Nell esempio utilizziamo il file sytem module di Node.js, importando il metodo createReadStream, che creerà un evento quando va a vedere il contenuto di un file da noi specificato;
+
+-Infatti anche qui è possibile inserire dei listeners che vanno a coprire le fasi di lettura del file da parte di createReadStream (quindi il flusso di lettura) => Queste fasi sono : compilazione dei dati, fine del processo di lettura, errori durante il processo di lettura;
+
+-Quando createReadStream ha effettivamente dei dati da leggere emette un evento chiamato data, ed il listener riceve il blocco di codice (chunk), nel quale andremo a stampare il contenuto del file che sta leggendo il metodo;
+
+-Quando lo strem da noi creato finisce di leggere i dati del file che ha ricevuto allora attiva un 'end' object, nel quale possiamo stampare la fine della lettura del nostro codice;
+
+-Infine se al flusso viene data un directory o un file che non esistono allora si attiverà un evento error, che presenta un oggetto error, nel quale viene stampato l'errore eventuale che ha incontrato il flusso nella lettura dei files;
+
+## REACTIVE PROGRAMMING
+
+## RxJS
+
+Libreria di estensioni reattive per JS, questa libreria combina parti del modello dei listeners(che in JS viene gestito con gli eventi) ed l'iterator pattern (che in JS viene costruito con degli oggetti che forniscono un metodo next per passar velocemente all'elemento successivo), collection pipelines (che organizzano le funzioni in una pipeline che opera su una raccolta di dati);
+Quindi RxJS ci consente di gestire tutti questi eventi asincroni come se fossero all'interno di un array, quindi come una raccolta;
+
+-Nel caso specifico vediamo che importiamo tre metodi dal modulo rxjs che sono range, map e filter;
+
+-Creiamo un observable, che può essere equivalente ad un Array, il quale emette numeri che vanno da 1 a 40, all'interno di questo observable, poi utilizziamo il metodo subscribe per attaccarci da un osservatore e passandogli un observable che è l'oggetto che contiene le tre chiavi next, error, complete;
+
+-Abbiamo anche due operatori, un filter ed un map (i quali rispettivamente filtreno l'observable restituendo i numeri pari, mentre il secondo lo mappa facendo una somma dei numeri filtrati), i due metodi vengono messi assieme dalla funzione pipe;
