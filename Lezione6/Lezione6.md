@@ -90,3 +90,36 @@ e così via;
 
 - Vedremo come eliminare un dato dal database fittizio di pianti che abbiamo costruito;
   -Come con gli altri metodi specifichiamo il metodo .delete, come primo parametro inseriamo l'url del database con l'id, poi destrutturiamo l'id del pianeta da eliminare e lo poniamo uguale a response.params, infine andiamo a fare un filter dell'array di pianeti dove controlliamo che l'id del pianeta da rimuovere sia diverso dall'id che abbiamo destrutturato precedentemente, poi infine inseriamo sempre la risposta in formato JSON con la response.status(200) e concatenando il metodo json che ci darà il JSON di riposta del nostro server;
+
+## CONTROLLERS
+
+- Vediamo come aggiungere dei controllers alla nostra Express Api;
+
+-Essi sono utilizzati molto spesso nell'archittetura base del backend;
+
+-Nel nostro caso sposteremo le callback in cui richiamiamo la request e la response dell'api in un file esterno che chiameremo controller per il database fittizio di pianeti;
+
+-Quindi creiamo un file che chiameremo planets.ts all'interno del folder controllers;
+
+-In questo file inseriremo sia i type da noi creati sia il database fittizio;
+
+-Poi stanziamo una const per ogni callback che andiamo ad utilizzare nel server, i nomi ricordiamoci che devono essere esplicativi e semplici;
+
+-Infine facciamo l'export di queste const che contengono le callback e le importiamo nel file server.ts, inserendole nel secondo termine dei metodi .get, .post, .put, .delete etc.
+
+-Assicurandoci che tutto funzioni per il meglio, i controller sono degli strumenti utilissimi per staccare la logica e la creazione di funzioni dal server e falle funzionare in un luogo sicuro, senza il rischio di doverle compromettere con aggiornamenti sul server futuri;
+
+## VALIDATION
+
+-Vediamo come convalidare l'oggetto planet nel nostro database con l'aiuto di una libreria "Joi";
+
+- Joi utilizza una sintassi ed un metodo specifico per la validazione dei dati nel nostro database;
+
+-Dopo aver installato Joi tramite npm: npm i joi, andremo ad importarlo nel file planets.ts all'interno dei controllers, subito dopo andremo a stanziate una const che specifichiamo essere la validazione dei nostri pianeti;
+
+-In questa const utilizziamo il metodo Joi.object, che crea un oggetto con le coppie chiavi valore che decidiamo noi;
+
+-il nostro id sarà validato da Joi come un numero, intero e obbligatorio (required)
+-mentre il name sarà validato come una stringa obbligatoria;
+
+-infine utilizziamo questa nuova validazione ad esempio nel metodo create del nostro server, dove andremo a fare la validazione dell'oggetto che vogliamo inviare al nostro server => se le key value corrispondono allora il processo sarà il solito e l'oggetto nuovo verrà inserito nel JSON che è il nostro database, se invece la validate dà un errore, allora ritorneremo un json di errore (che ha status 400), e che come messaggio ha proprio l'errore che viene compilato dalla validaizone di Joi;
