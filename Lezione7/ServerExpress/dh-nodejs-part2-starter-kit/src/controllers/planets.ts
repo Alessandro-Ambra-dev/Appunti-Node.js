@@ -17,9 +17,6 @@ const setUpDb = async () => {
   await db.none(`INSERT INTO planets (name) VALUES ('Mars')`);
   await db.none(`INSERT INTO planets (name) VALUES ('Jupiter')`);
   await db.none(`INSERT INTO planets (name) VALUES ($1)`, String(iterateGen()));
-
-  const planets = await db.many(`SELECT * FROM planets`);
-  console.log(planets);
 };
 
 const updateDb = async () => {
@@ -33,7 +30,7 @@ updateDb();
 
 function iterateGen() {
   for (let i = 0; i < 100; i++) {
-   return generateString(10)
+    return generateString(10);
   }
 }
 
@@ -47,29 +44,17 @@ function generateString(lun: number) {
   return str1;
 }
 
-type Planet = {
-  id: number;
-  name: string;
-};
-type Planets = Planet[];
-
-let planets: Planets = [
-  { id: 1, name: "Earth" },
-  { id: 2, name: "Mars" },
-  { id: 3, name: "Jupiter" },
-  { id: 4, name: "Venus" },
-  { id: 5, name: "Uranus" },
-  { id: 6, name: "Neptune" },
-  { id: 7, name: "Jove" },
-];
-
-const getAll = (request: Request, response: Response) => {
+const getAll = async (request: Request, response: Response) => {
+  const planets = await db.many(`SELECT * FROM planets`);
   response.status(200).json(planets);
 };
 
-const getOneById = (request: Request, response: Response) => {
+const getOneById = async (request: Request, response: Response) => {
   const { id } = request.params;
-  const planet = planets.find((p) => p.id === Number(id));
+  const planet = await db.oneOrNone(
+    `SELECT * FROM planets WHERE id=$1`,
+    Number(id)
+  );
   response.status(200).json(planet);
 };
 
@@ -80,7 +65,7 @@ const planetSchema = Joi.object({
 
 const create = (request: Request, response: Response) => {
   const { id, name } = request.body;
-  const newPlanet: Planet = { id, name };
+  const newPlanet = { id, name };
 
   const validateNewPlanet = planetSchema.validate(newPlanet);
 
