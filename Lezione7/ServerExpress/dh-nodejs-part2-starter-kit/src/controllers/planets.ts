@@ -1,48 +1,51 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
+import { request } from "http";
 import Joi from "joi";
 import pgPromise from "pg-promise";
 
 const db = pgPromise()("postgres://postgres:postgres@localhost:5432/postgres");
 const setUpDb = async () => {
   await db.none(`
+
   DROP TABLE IF EXISTS planets;
 
   CREATE TABLE planets (
    id SERIAL PRIMARY KEY,
-   name TEXT NOT NULL
+   name TEXT NOT NULL,
+   image TEXT
   );
 `);
 
   await db.none(`INSERT INTO planets (name) VALUES ('Earth')`);
   await db.none(`INSERT INTO planets (name) VALUES ('Mars')`);
   await db.none(`INSERT INTO planets (name) VALUES ('Jupiter')`);
-  await db.none(`INSERT INTO planets (name) VALUES ($1)`, String(iterateGen()));
+  // await db.none(`INSERT INTO planets (name) VALUES ($1)`, String(iterateGen()));
 };
+setUpDb()
+// const updateDb = async () => {
+//   await setUpDb();
+//   await iterateGen();
+//   const names = await db.many(`SELECT name FROM planets`);
+//   console.log(names);
+// };
 
-const updateDb = async () => {
-  await setUpDb();
-  await iterateGen();
-  const names = await db.many(`SELECT name FROM planets`);
-  console.log(names);
-};
+// updateDb();
 
-updateDb();
+// function iterateGen() {
+//   for (let i = 0; i < 100; i++) {
+//     return generateString(10);
+//   }
+// }
 
-function iterateGen() {
-  for (let i = 0; i < 100; i++) {
-    return generateString(10);
-  }
-}
-
-function generateString(lun: number) {
-  let str1 = "";
-  let str2 = "asdfghjklo";
-  for (let i = 0; i < lun; i++) {
-    let strLength = Math.floor(Math.random() * str2.length);
-    str1 += str2.substring(strLength, strLength + 1);
-  }
-  return str1;
-}
+// function generateString(lun: number) {
+//   let str1 = "";
+//   let str2 = "asdfghjklo";
+//   for (let i = 0; i < lun; i++) {
+//     let strLength = Math.floor(Math.random() * str2.length);
+//     str1 += str2.substring(strLength, strLength + 1);
+//   }
+//   return str1;
+// }
 
 const getAll = async (request: Request, response: Response) => {
   const planets = await db.many(`SELECT * FROM planets`);
@@ -59,13 +62,12 @@ const getOneById = async (request: Request, response: Response) => {
 };
 
 const planetSchema = Joi.object({
-  id: Joi.number().integer().required(),
   name: Joi.string().required(),
 });
 
-const create = (request: Request, response: Response) => {
-  const { id, name } = request.body;
-  const newPlanet = { id, name };
+const create = async (request: Request, response: Response) => {
+  const { name } = request.body;
+  const newPlanet = { name };
 
   const validateNewPlanet = planetSchema.validate(newPlanet);
 
@@ -74,24 +76,37 @@ const create = (request: Request, response: Response) => {
       message: validateNewPlanet.error.details[0].message,
     });
   } else {
-    planets = [...planets, newPlanet];
+    await db.none(`INSERT INTO planets (name) VALUES ($1)`, name);
     response.status(201).json({ message: "The planet was created" });
   }
 };
 
-const updateById = (request: Request, response: Response) => {
+const updateById = async (request: Request, response: Response) => {
   const { id } = request.params;
   const { name } = request.body;
-  planets = planets.map((p) => (p.id === Number(id) ? { ...p, name } : p));
-
+  await db.none(`UPDATE planets SET name=$2 WHERE id=$1`, [id, name]);
   response.status(200).json({ message: "The planet was updated" });
 };
 
-const deleteById = (request: Request, response: Response) => {
+const deleteById = async (request: Request, response: Response) => {
   const { id } = request.params;
-  planets = planets.filter((p) => p.id !== Number(id));
+  await db.none(`DELETE FROM planets WHERE id=$1`, Number(id));
 
   response.status(200).json({ message: "The planet was deleted" });
 };
 
-export { getAll, getOneById, create, updateById, deleteById };
+const createImage = async (request: Request, response: Response) => {
+  const { id } = request.params;
+  const fileName = request.file?.path;
+
+  if (fileName) {
+    db.none(`UPDATE planets SET image=$2 WHERE id=$1`, [id, fileName]);
+    response
+      .status(201)
+      .json({ message: "Planet image uploaded successfully" });
+  } else {
+    response.status(400).json({ message: "Planet image failed to upload" });
+  }
+};
+
+export { getAll, getOneById, create, updateById, deleteById, createImage };
